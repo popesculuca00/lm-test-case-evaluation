@@ -1,7 +1,7 @@
 import asyncio
 import httpx
 
-from openai import OpenAI
+from openai import AsyncOpenAI
 
 from client_interface.client_utils import detect_server_config
 
@@ -40,12 +40,12 @@ class ClientInterface:
         if self.inference_server == "llamacpp":
             api_base = "http://localhost:1234/v1"
             self.model = "local-model"
-            self.client = OpenAI(base_url=api_base, api_key=self.api_key)
+            self.client = AsyncOpenAI(base_url=api_base, api_key=self.api_key)
 
         elif self.inference_server == "vllm" or self.model:
             self.inference_server = "vllm"
             api_base = "http://localhost:8000/v1"
-            self.client = OpenAI(base_url=api_base, api_key=self.api_key)
+            self.client = AsyncOpenAI(base_url=api_base, api_key=self.api_key)
 
     def __repr__(self):
         return f"ServerConfig(\n{self.inference_server=}\n{self.model=})".replace(
