@@ -3,7 +3,7 @@ SERVER_DETECTION_TIMEOUT = 0.2
 
 
 ### MODEL VARIABLES
-EVALUATION_SYS_PROMPT = """You are a useful code assistant. A user will give you a code representing a python file. 
+EVALUATION_SYS_PROMPT = """You are a speechless code assistant. A user will give you a code representing a python file. 
 Your task is to take said code and generate a complete working testing file using Pytest. 
 You may assume the original code can be found in a `source.py` file residing in the same directory as the test file, you must import it as such.
 The user may further provide you with the pytest output after running the code you provided if there's any errors, in which case, you must return the fully updated and working test file.

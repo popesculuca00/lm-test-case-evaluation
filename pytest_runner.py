@@ -1,7 +1,9 @@
 import string
 import random
-import sys, subprocess, os, shutil
+import subprocess, os, shutil
 import re
+
+from utils import timeout
 
 
 def strip_ansi_escape_sequences(s):
@@ -42,11 +44,11 @@ def get_test_case_fails(result: subprocess.CompletedProcess[str]) -> str:
     """
     Extracts all specific fails from the pytest output under the `short test summary info` section.
     """
-    # test_cases = re.findall("(FAILED.*)$", result.stdout)
     test_cases = re.findall("(FAILED\s*test_source.py.*)", result.stdout)
     return "\n".join(test_cases)
 
 
+@timeout(10)
 def run_pytest(
     input_code: str,
     pytest_code: str,

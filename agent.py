@@ -28,7 +28,11 @@ class CodeAgent:
         self.history = []
 
     async def generate_response_async(
-        self, user_query: str | list[str], n: int = 1, extract_code: bool = True, history: None | list[dict] = None
+        self,
+        user_query: str | list[str],
+        n: int = 1,
+        extract_code: bool = True,
+        history: None | list[dict] = None,
     ):
         if isinstance(user_query, list):
             return await self.async_generate_main(
@@ -40,7 +44,11 @@ class CodeAgent:
             )
 
     async def async_generate_main(
-        self, queries: list[str], n: int = 1, extract_code: bool = True, history: None | list[dict] = None
+        self,
+        queries: list[str],
+        n: int = 1,
+        extract_code: bool = True,
+        history: None | list[dict] = None,
     ):
         tasks = [
             self.async_generate(query, n, extract_code, history if history else None)
@@ -51,32 +59,34 @@ class CodeAgent:
         return results
 
     async def async_generate(
-        self, user_query: str, n: int = 1, extract_code: bool = True, history: None | list[dict] = None
+        self,
+        user_query: str,
+        n: int = 1,
+        extract_code: bool = True,
+        history: None | list[dict] = None,
     ):
-        
         if not isinstance(user_query, str):
-            raise TypeError(
-                f"user_query is of type {type(user_query)}, expected str."
-            )
+            raise TypeError(f"user_query is of type {type(user_query)}, expected str.")
 
         if history is None:
             history = [
                 {"role": "system", "content": self.sys_prompt},
                 {"role": "user", "content": user_query},
             ]
-        else:
-            history = history
 
         if self.client.inference_server != "vllm" and n > 1:
-            warnings.warn(f"n>1 for {self.client.inference_server=}, generation is limited to 1")
+            warnings.warn(
+                f"n>1 for {self.client.inference_server=}, generation is limited to 1"
+            )
             n = 1
 
         completion = await self.client.create(
             model=self.client.model,
             messages=history,
-            temperature=0.7,
+            temperature=0.1,
             stream=False,
-            n=n
+            frequency_penalty=1.05,
+            n=n,
         )
 
         results = []
@@ -88,7 +98,11 @@ class CodeAgent:
         return results
 
     def generate_response(
-        self, user_query: str | list[str], n: int = 1, extract_code: bool = True, history: None | list[dict] = None
+        self,
+        user_query: str | list[str],
+        n: int = 1,
+        extract_code: bool = True,
+        history: None | list[dict] = None,
     ):
         return asyncio.run(
             self.generate_response_async(
@@ -96,12 +110,10 @@ class CodeAgent:
             )
         )
 
-
     def empty_history(self):
         """Empties all chat history except the system prompt"""
         if self.history:
             self.history = [self.history[0]]
-
 
 
 if __name__ == "__main__":
@@ -113,11 +125,13 @@ if __name__ == "__main__":
     start = time.time()
     # generated_pytest = agent.generate_response(dummy_code, n=2)
 
-
     history = [
         {"role": "system", "content": EVALUATION_SYS_PROMPT},
-        {"role": "user", "content": dummy_code}]
-    generated_pytest = agent.generate_response([dummy_code, dummy_code], n=1, history=history) # multiple predictions test
+        {"role": "user", "content": dummy_code},
+    ]
+    generated_pytest = agent.generate_response(
+        [dummy_code, dummy_code], n=1, history=history
+    )
 
     print(
         f"Generation took {time.time() - start} seconds for {len(generated_pytest)} generations."
